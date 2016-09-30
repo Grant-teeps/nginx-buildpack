@@ -12,10 +12,12 @@
 NGINX_VERSION=${NGINX_VERSION-1.11.3}
 PCRE_VERSION=${PCRE_VERSION-8.39}
 ZLIB_VERSION=${ZLIB_VERSION-1.2.8}
+NCHAN_VERSION=${NCHAN_VERSION-1.0.3}
 
 nginx_tarball_url=http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
 pcre_tarball_url=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-${PCRE_VERSION}.tar.gz
 zlib_url=http://zlib.net/zlib-${ZLIB_VERSION}.tar.gz
+nchan_url=https://github.com/slact/nchan/archive/v${NCHAN_VERSION}.tar.gz
 
 temp_dir=$(mktemp -d /tmp/nginx.XXXXXXXXXX)
 
@@ -25,6 +27,9 @@ python -m SimpleHTTPServer $PORT &
 
 cd $temp_dir
 echo "Temp dir: $temp_dir"
+
+echo "Downloading $nchan_url"
+curl -L $nchan_url | tar xzv
 
 echo "Downloading $nginx_tarball_url"
 curl -L $nginx_tarball_url | tar xzv
@@ -38,6 +43,7 @@ echo "Downloading $zlib_url"
 (
   cd nginx-${NGINX_VERSION}
   ./configure \
+    --add-module=../nchan-${NCHAN_VERSION}
     --with-pcre=pcre-${PCRE_VERSION} \
     --with-zlib=zlib-${ZLIB_VERSION} \
     --prefix=/tmp/nginx \
